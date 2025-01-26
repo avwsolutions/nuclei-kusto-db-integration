@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": {
+      "value": "nuclei"
+    },
+    "environment": {
+      "value": "sandbox"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "servicepPrincipalObjectId": {
+      "value": "9ad0c7dc-7200-4192-a19a-d27bee23b9f9"
+    }
+  }
+}
