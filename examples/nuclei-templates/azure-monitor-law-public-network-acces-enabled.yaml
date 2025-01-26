@@ -1,0 +1,55 @@
+id: azure-monitor-law-public-network-acces-enabled
+info:
+  name: Azure Log Analytics Workspace Public Network Acces Enabled
+  author: avwsolutions
+  severity: medium
+  description: |
+    Ensure that public network access is disabled for Log Analytics Workspaces (LAWs) in order to protect against persistent and advanced attacks against unauthorized data access.
+  impact: |
+    Not disabling public access for log anaytics workspaces can leave them susceptible to advanced persistent threats and compromise the network integrity and security of your Log Analytics APIs.
+  remediation: |
+    Disable public network access for Log Analytics Workspaces (LAWs) and only make it accessible for Azure Private Link configured resources.
+  reference:
+    - https://learn.microsoft.com/en-us/azure/azure-monitor/logs
+  tags: cloud,devops,azure,microsoft,monitor,log-analytics,azure-cloud-config
+
+flow: |
+  code(1);
+  for (let LawData of iterate(template.lawList)) {
+    set("ids", LawData);
+    code(2);
+  }
+
+self-contained: true
+code:
+  - engine:
+      - sh
+      - bash
+    source: |
+      az monitor log-analytics workspace list --query '[*].id'
+
+    extractors:
+      - type: json
+        name: lawList
+        internal: true
+        json:
+          - '.[]'
+
+  - engine:
+      - sh
+      - bash
+    source: |
+      az monitor log-analytics workspace show --ids "$ids" --query '{"publicNetworkAccessForIngestion": publicNetworkAccessForIngestion, "publicNetworkAccessForQuery": publicNetworkAccessForQuery}'
+
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - '"publicNetworkAccessForIngestion": "Enabled"'
+          - '"publicNetworkAccessForQuery": "Enabled"'
+
+    extractors:
+      - type: dsl
+        dsl:
+          - 'ids + " does have Public Network Access enabled"'
+# digest: 4a0a00473045022003222f3ed0a7a05afbf68bbf142e4e140d1dd9522b775f6bca54d662f10375a3022100f80546ad843aadb8d6aec3837d4fa46ca729a6cbfcec8f8c0686489673a24f80:02dbc90f6818a9310aa042e6621eefd8
